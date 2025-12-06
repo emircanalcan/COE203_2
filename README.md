@@ -24,7 +24,6 @@ Bu yapıda her dosya direkt proje kök dizininde bulunur ve çalıştırılabili
 🔴 Gerçek Zamanlı Veri İzleme
 
 Binance API üzerinden 50 kripto parayı anlık olarak çekeriz
-
 Fiyat, 24 saatlik değişim, hacim ve session yüzdesi takip edilir
 
 Veri akışı başlatıp durdurulabilir

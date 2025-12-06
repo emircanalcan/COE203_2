@@ -65,6 +65,10 @@ class CryptoAnalyticsApp:  # pylint: disable=too-many-instance-attributes
         self.tree = None
         self.txt_analysis = None
 
+        # DB viewer window
+        self.db_window = None
+        self.db_tree = None
+
         self.setup_styles()
         self.create_header_section()
         self.create_status_section()
@@ -175,6 +179,16 @@ class CryptoAnalyticsApp:  # pylint: disable=too-many-instance-attributes
             command=self.open_chart_window,
             bg="#03a9f4",
             fg="black",
+            font=("Arial", 10, "bold"),
+            width=15,
+        ).pack(side="left", padx=5)
+
+        tk.Button(
+            control_frame,
+            text="📁 DB VIEW",
+            command=self.open_db_view_window,
+            bg="#9c27b0",
+            fg="white",
             font=("Arial", 10, "bold"),
             width=15,
         ).pack(side="left", padx=5)
@@ -501,6 +515,109 @@ class BinanceSpider(scrapy.Spider):
         except Exception:
             messagebox.showerror("Scrapy Error", "Scrapy failed. Check logs.")
             logger.error("Scrapy execution failed.")
+
+    def open_db_view_window(self):
+        """Open a window showing MongoDB token data in a table."""
+        try:
+            if self.db_window and tk.Toplevel.winfo_exists(self.db_window):
+                self.db_window.lift()
+                self.refresh_db_view_data()
+                return
+
+            self.db_window = tk.Toplevel(self.root)
+            self.db_window.title("MongoDB - Top Tokens Collection")
+            self.db_window.geometry("900x500")
+            self.db_window.configure(bg=self.colors["bg"])
+
+            frame = tk.Frame(self.db_window, bg=self.colors["bg"])
+            frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+            cols = ("rank", "symbol", "name", "price", "change_24h", "volume", "updated")
+            self.db_tree = ttk.Treeview(frame, columns=cols, show="headings", height=18)
+
+            headers = {
+                "rank": "#",
+                "symbol": "Symbol",
+                "name": "Name",
+                "price": "Price ($)",
+                "change_24h": "24h Change %",
+                "volume": "Volume (24h)",
+                "updated": "Last Updated",
+            }
+
+            for col, title in headers.items():
+                self.db_tree.heading(col, text=title)
+                self.db_tree.column(col, anchor="center", width=120)
+
+            scrollbar = ttk.Scrollbar(
+                frame, orient="vertical", command=self.db_tree.yview
+            )
+            self.db_tree.configure(yscrollcommand=scrollbar.set)
+
+            self.db_tree.pack(side="left", fill="both", expand=True)
+            scrollbar.pack(side="right", fill="y")
+
+            btn_frame = tk.Frame(self.db_window, bg=self.colors["bg"])
+            btn_frame.pack(fill="x", padx=10, pady=5)
+
+            tk.Button(
+                btn_frame,
+                text="🔄 Refresh DB Data",
+                command=self.refresh_db_view_data,
+                bg=self.colors["accent"],
+                fg="white",
+                font=("Arial", 10, "bold"),
+                width=20,
+            ).pack(side="left")
+
+            self.refresh_db_view_data()
+        except Exception as exc:
+            logger.error("Failed to open DB viewer window: %s", exc)
+            messagebox.showerror("Error", "Unable to open DB viewer window.")
+
+    def refresh_db_view_data(self):
+        """Fetch data from MongoDB and populate DB viewer table."""
+        if not self.db_tree:
+            return
+
+        try:
+            # pylint: disable=no-member
+            docs = (
+                TokenDocument.objects()
+                .order_by("market_cap_rank")
+                .limit(self.limit)
+            )
+        except Exception as exc:
+            logger.error("DB viewer query failed: %s", exc)
+            messagebox.showerror("DB Error", "Failed to load data from MongoDB.")
+            return
+
+        self.db_tree.delete(*self.db_tree.get_children())
+
+        for d in docs:
+            try:
+                price = d.current_price or 0.0
+                if price < 1:
+                    price_fmt = f"${price:.4f}"
+                else:
+                    price_fmt = f"${price:,.2f}"
+
+                change = d.price_change_percentage_24h or 0.0
+                vol = d.total_volume or 0.0
+                updated = d.last_updated.isoformat() if d.last_updated else "N/A"
+
+                values = (
+                    d.market_cap_rank or 0,
+                    d.symbol or "",
+                    d.name or "",
+                    price_fmt,
+                    f"{change:+.2f}%",
+                    f"${vol:,.0f}",
+                    updated[:19],
+                )
+                self.db_tree.insert("", "end", values=values)
+            except Exception:
+                continue
 
     def on_tree_select(self, _event):
         """Handle row selection in the token table."""

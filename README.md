@@ -1,37 +1,70 @@
-# 🚀 CRYPTO ANALYTICS SYSTEM (CAS)
+🚀 Crypto Analytics System – Real-Time Binance Tracker
 
-Bu proje, Python ve Tkinter kullanılarak geliştirilmiş, **Binance** API'si üzerinden gerçek zamanlı kripto para verilerini çeken, analiz eden ve görselleştiren bir masaüstü uygulamasıdır. Veri kalıcılığı ve analiz için MongoDB Atlas kullanılmıştır.
+Bu proje, Binance üzerindeki kripto varlıklarını gerçek zamanlı izleyen, analiz eden, grafiksel olarak gösteren ve verileri MongoDB üzerinde saklayan bir masaüstü uygulamasıdır.
 
-***
+Uygulama Python, Tkinter, Matplotlib, MongoEngine teknolojileri ile bir araya getirilmiştir.
+Proje aynı zamanda EXE formatına dönüştürülmüş olup tüm Windows cihazlarda çalışabilir.
 
-## ✨ Temel Özellikler
+📂 Proje Yapısı
 
-* **OOP Mimarisi:** Gelişmiş nesne yönelimli programlama (OOP) yapıları (Inheritance, Abstract Base Classes, Protocols) kullanılmıştır.
-* **Gerçek Zamanlı Veri Çekme:** Binance API'si üzerinden 24 saatlik fiyat değişimleri ve işlem hacimleri dahil olmak üzere Top N (limit ayarlanabilir) kripto paranın anlık verilerini çeker.
-* **Veri Kalıcılığı (MongoDB):** Çekilen tüm anlık ve tarihsel veriler MongoDB Atlas veritabanına kaydedilir (MongoEngine ODM kullanılmıştır).
-* **Canlı Tablo ve Seans Takibi:** Tkinter tablosu üzerinde fiyat, 24 saatlik değişim ve oturum (session) başlangıcından itibaren toplam değişimi renk kodlarıyla takip eder.
-* **Piyasa Analizi:** En çok kazananlar (Top Gainers) ve en çok kaybedenler (Top Losers) listelerini çıkaran bir analiz motoru içerir.
-* **Gelişmiş Görselleştirme:** Seçilen herhangi bir tokenin geçmiş fiyat performansını gösteren dinamik bir grafik (Matplotlib) penceresi sunar.
-* **Scrapy Entegrasyonu:** Tek bir butonla dinamik olarak bir Scrapy örümceği (spider) oluşturup çalıştırabilir ve veriyi yerel JSON dosyasına kaydeder.
-* **Pydantic Veri Modelleri:** Veri tutarlılığını sağlamak için tüm veri transfer objeleri (DTO) Pydantic ile doğrulanmıştır.
+Proje şu anda GitHub’da aşağıdaki gibi sade bir yapıya sahiptir:
 
-***
+.
+├── .gitignore        # Gereksiz dosyaların Git'e dahil edilmemesi için
+├── core.py           # API işlemleri, MongoDB bağlantısı ve veri modelleri
+├── main.exe          # Derlenmiş çalıştırılabilir uygulama
+├── main.py           # Projenin giriş dosyası (GUI başlatılır)
+├── test.py           # Test amaçlı denemeler
+└── ui.py             # Tkinter arayüzü, grafikler, analiz ekranı
 
-## 🛠️ Kurulum ve Çalıştırma
 
-### 1. Ön Koşullar
+Bu yapıda her dosya direkt proje kök dizininde bulunur ve çalıştırılabilir.
 
-Projenin çalışması için aşağıdaki yazılımların ve kütüphanelerin yüklü olması gerekir:
+📌 Uygulama Özellikleri
+🔴 Gerçek Zamanlı Veri İzleme
 
-* **Python 3.10+**
-* **Git**
-* **MongoDB Atlas** hesabı (Veritabanı bağlantı linki **`core.py`** içerisinde tanımlıdır.)
+Binance API üzerinden 50 kripto parayı anlık olarak çekeriz
 
-### 2. Kütüphane Kurulumu
+Fiyat, 24 saatlik değişim, hacim ve session yüzdesi takip edilir
 
-Projenin ana bağımlılıkları aşağıdaki gibidir. Projeyi klonladığınız dizinde aşağıdaki komutu çalıştırın:
+Veri akışı başlatıp durdurulabilir
 
-```bash
-# Gerekli tüm Python kütüphanelerini kurar
-pip install pymongo pydantic mongoengine requests scrapy dnspython matplotlib# COE203_2
+📊 Grafiksel Coin Analizi
 
+Her coin için 30 günlük fiyat grafiği çizilir
+
+Seçili coin hakkında detaylı bilgiler gösterilir
+
+Matplotlib kullanılarak profesyonel grafik elde edilir
+
+🗄️ MongoDB Atlas Entegrasyonu
+
+Token bilgileri TokenDocument modelleriyle kaydedilir
+
+Geçmiş fiyatlar HistoricalDocument ile tutulur
+
+Uygulama açıldığında son kayıtlar yüklenir
+
+Database içinde kategori, fiyat, hacim gibi bilgiler saklanır
+
+📈 Piyasa Analiz Modülü
+
+Arayüz üzerindeki ANALYZE butonuna basıldığında:
+
+En çok artan 5 token
+
+En çok düşen 5 token
+
+Toplam taranan varlık sayısı
+
+Zaman damgalı analiz raporu
+
+üretilir.
+
+🕷️ Scrapy Entegrasyonu
+
+GUI üzerinden Scrapy spider oluşturulur
+
+Binance USDT pariteleri scrape edilir
+
+Çıktı binance_data.json dosyasına kaydedilir
